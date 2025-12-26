@@ -54,12 +54,16 @@ Example structure:
 
 ```
 Features/
-  └─ Documents/
-  └─ Create/
-    ├─ Endpoint.cs
-    ├─ Command.cs
-    ├─ Validator.cs
-  └─ Handler.cs
+  Documents/
+    Create/
+      Endpoint.cs
+      Request.cs
+      Response.cs
+      Validator.cs
+    List/
+      Endpoint.cs
+      Request.cs
+      Response.cs
 ```
 
 ## Clean-ish Boundaries
@@ -103,11 +107,12 @@ Clean Architecture principles are applied **only where they reduce friction**.
 The MVP is intentionally limited to **three core user journeys**:
 
 1. **Add a document**
-   - Metadata (type, owner, expiration date, tags)
+   - Metadata (type, owner, expiration date)
    - File upload
-2. **Search and view documents**
-   - Full-text or tag-based search
-   - Download or view stored files
+2. **Browse documents + see what's urgent**
+   - List + filters (subject, type, status)
+   - See soon to be expired + expired
+   - View details + download file
 3. **Expiration reminders**
    - Background worker checks expiration dates
    - Notifications are generated before deadlines
@@ -213,4 +218,4 @@ Currently focusing on:
 ## 📜 License
 
 This project is intended for educational and portfolio purposes.
-Licensed under MIT License.
+Licensed under MIT.

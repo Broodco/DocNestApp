@@ -52,16 +52,17 @@ This minimizes cross-cutting changes and avoids excessive scaffolding.
 
 Example structure:
 
+```
 Features/
-└─ Documents/
-└─ Create/
-├─ Endpoint.cs
-├─ Command.cs
-├─ Validator.cs
-└─ Handler.cs
+  └─ Documents/
+  └─ Create/
+    ├─ Endpoint.cs
+    ├─ Command.cs
+    ├─ Validator.cs
+  └─ Handler.cs
+```
 
-
-### Clean-ish Boundaries
+## Clean-ish Boundaries
 Clean Architecture principles are applied **only where they reduce friction**.
 
 - Domain logic stays clean when it enforces real invariants

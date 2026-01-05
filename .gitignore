@@ -416,3 +416,6 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+
+# App Local Files
+src/DocNestApp.Api/App_Data/files/

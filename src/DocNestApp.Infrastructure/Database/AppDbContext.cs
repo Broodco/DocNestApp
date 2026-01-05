@@ -1,4 +1,5 @@
 using DocNestApp.Domain.Documents;
+using DocNestApp.Domain.Reminders;
 using Microsoft.EntityFrameworkCore;
 
 namespace DocNestApp.Infrastructure.Database;
@@ -6,7 +7,8 @@ namespace DocNestApp.Infrastructure.Database;
 public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
 {
     public DbSet<Document> Documents => Set<Document>();
-
+    public DbSet<Reminder> Reminders => Set<Reminder>();
+    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -29,6 +31,23 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
             b.Property(x => x.OriginalFileName).HasMaxLength(255);
             b.Property(x => x.ContentType).HasMaxLength(100);
             b.Property(x => x.SizeBytes);
+        });
+        
+        modelBuilder.Entity<Reminder>(b =>
+        {
+            b.ToTable("reminders");
+            b.HasKey(x => x.Id);
+
+            b.Property(x => x.CreatedAtUtc).IsRequired();
+            b.Property(x => x.DueAtUtc).IsRequired();
+            b.Property(x => x.ExpiresOn).IsRequired();
+            b.Property(x => x.DaysBefore).IsRequired();
+
+            // Idempotency: one reminder per doc per policy
+            b.HasIndex(x => new { x.DocumentId, x.DaysBefore }).IsUnique();
+
+            b.HasIndex(x => new { x.UserId, x.DueAtUtc });
+            b.HasIndex(x => x.DispatchedAtUtc);
         });
     }
 }

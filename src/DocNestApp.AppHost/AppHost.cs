@@ -10,4 +10,8 @@ builder.AddProject<Projects.DocNestApp_Api>("docnest-api")
     .WithReference(docnestdb)
     .WaitFor(postgres);
     
+builder.AddProject<Projects.DocNestApp_Worker>("docnest-worker")
+    .WithReference(docnestdb)
+    .WaitFor(postgres);
+
 builder.Build().Run();

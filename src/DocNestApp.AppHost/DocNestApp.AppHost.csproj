@@ -8,4 +8,13 @@
     <UserSecretsId>0bd28cf9-50d4-45fa-ba9c-96306b860ab9</UserSecretsId>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\DocNestApp.Api\DocNestApp.Api.csproj" />
+    <ProjectReference Include="..\DocNestApp.ServiceDefaults\DocNestApp.ServiceDefaults.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="13.1.0" />
+  </ItemGroup>
+
 </Project>

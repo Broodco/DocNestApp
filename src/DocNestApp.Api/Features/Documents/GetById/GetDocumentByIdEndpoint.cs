@@ -24,7 +24,8 @@ public sealed class GetDocumentByIdEndpoint(AppDbContext db) : Endpoint<GetDocum
                 Id = d.Id,
                 Title = d.Title,
                 Type = d.Type,
-                ExpiresOn = d.ExpiresOn
+                ExpiresOn = d.ExpiresOn,
+                HasFile = d.FileKey != null
             })
             .SingleOrDefaultAsync(ct);
 
@@ -49,4 +50,5 @@ public sealed class GetDocumentByIdResponse
     public string Title { get; init; } = null!;
     public string Type { get; init; } = null!;
     public DateOnly? ExpiresOn { get; init; }
+    public bool HasFile { get; init; }
 }

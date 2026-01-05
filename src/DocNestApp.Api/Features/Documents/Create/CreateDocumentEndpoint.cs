@@ -1,3 +1,5 @@
+using DocNestApp.Application.Abstractions.Storage;
+
 namespace DocNestApp.Api.Features.Documents.Create;
 
 using Domain.Documents;
@@ -5,12 +7,13 @@ using Infrastructure.Database;
 using FastEndpoints;
 using FluentValidation;
 
-public sealed class CreateDocumentEndpoint(AppDbContext db) : Endpoint<CreateDocumentRequest, CreateDocumentResponse>
+public sealed class CreateDocumentEndpoint(AppDbContext db, IFileStore fileStore) : Endpoint<CreateDocumentRequest, CreateDocumentResponse>
 {
     public override void Configure()
     {
         Post("/documents");
         AllowAnonymous();
+        AllowFileUploads();
         Validator<CreateDocumentValidator>();
         
         Description(d =>
@@ -42,6 +45,22 @@ public sealed class CreateDocumentEndpoint(AppDbContext db) : Endpoint<CreateDoc
         db.Documents.Add(doc);
         await db.SaveChangesAsync(ct);
         
+        if (req.File is not null)
+        {
+            await using var stream = req.File.OpenReadStream();
+
+            var stored = await fileStore.SaveAsync(
+                userId: DevUser.UserId,
+                documentId: doc.Id,
+                content: stream,
+                originalFileName: req.File.FileName,
+                contentType: req.File.ContentType,
+                ct: ct);
+
+            doc.AttachFile(stored.FileKey, stored.OriginalFileName, stored.ContentType, stored.SizeBytes, now);
+            await db.SaveChangesAsync(ct);
+        }
+        
         var location = $"/documents/{doc.Id}";
         HttpContext.Response.Headers.Location = location;
         HttpContext.Response.StatusCode = StatusCodes.Status201Created;
@@ -55,6 +74,7 @@ public sealed class CreateDocumentRequest
     public string Title { get; init; } = null!;
     public string Type { get; init; } = null!;
     public DateOnly? ExpiresOn { get; init; }
+    public IFormFile? File { get; init; } = null!;
 }
 
 public sealed class CreateDocumentResponse
@@ -68,5 +88,15 @@ public sealed class CreateDocumentValidator : AbstractValidator<CreateDocumentRe
     {
         RuleFor(x => x.Title).NotEmpty().MaximumLength(200);
         RuleFor(x => x.Type).NotEmpty().MaximumLength(50);
-    }
-}
+
+        When(x => x.File is not null, () =>
+        {
+            RuleFor(x => x.File!.Length)
+                .GreaterThan(0)
+                .WithMessage("File is empty.");
+
+            RuleFor(x => x.File!.Length)
+                .LessThanOrEqualTo(10 * 1024 * 1024) // 10MB MVP cap
+                .WithMessage("File is too large (max 10MB).");
+        });
+    }}

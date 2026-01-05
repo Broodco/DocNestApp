@@ -86,6 +86,7 @@ public sealed class ListDocumentsEndpoint(AppDbContext db)
                 Id = d.Id,
                 Title = d.Title,
                 Type = d.Type,
+                HasFile = d.FileKey != null,
                 ExpiresOn = d.ExpiresOn,
                 CreatedAt = d.CreatedAt,
                 UpdatedAt = d.UpdatedAt
@@ -131,6 +132,7 @@ public sealed class DocumentListItem
     public DateOnly? ExpiresOn { get; init; }
     public DateTime CreatedAt { get; init; }
     public DateTime UpdatedAt { get; init; }
+    public bool HasFile { get; init; }
 }
 
 public sealed class ListDocumentsValidator : AbstractValidator<ListDocumentsRequest>

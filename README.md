@@ -142,19 +142,6 @@ All services can run standalone without Aspire.
 
 ---
 
-## 🔧 Aspire Philosophy
-
-- Aspire wires services together locally via configuration
-- No Aspire-specific dependencies in domain or application logic
-- Services must run with `dotnet run` outside of Aspire
-
-This keeps the application easily exportable to:
-- Docker Compose
-- Cloud hosting platforms
-- CI environments
-
----
-
 ## 🔥 Avoiding Boilerplate Burnout
 
 This project intentionally avoids:
@@ -210,8 +197,7 @@ This allows:
 
 🚧 **In development**  
 Currently focusing on:
-- Core domain modeling
-- First vertical slice: document creation
+- First vertical slice: document creation with file upload
 
 ---
 

@@ -13,7 +13,17 @@ public sealed class Document
     public string Title { get; private set; } = null!;
 
     public string Type { get; private set; } = null!;
+    
+    public string? FileKey { get; private set; }
+    
+    public string? OriginalFileName { get; private set; }
+    
+    public string? ContentType { get; private set; }
+    
+    public long? SizeBytes { get; private set; }
 
+    public bool HasFile => FileKey is not null;
+    
     public DateOnly? ExpiresOn { get; private set; }
 
     public DateTime CreatedAt { get; private set; }
@@ -74,6 +84,24 @@ public sealed class Document
         Title = title.Trim();
         Type = type.Trim();
         ExpiresOn = expiresOn;
+        UpdatedAt = utcNow;
+    }
+    
+    public void AttachFile(string fileKey, string originalFileName, string contentType, long sizeBytes, DateTime utcNow)
+    {
+        if (string.IsNullOrWhiteSpace(fileKey))
+            throw new ArgumentException("FileKey is required.", nameof(fileKey));
+
+        if (string.IsNullOrWhiteSpace(originalFileName))
+            throw new ArgumentException("OriginalFileName is required.", nameof(originalFileName));
+
+        if (sizeBytes <= 0)
+            throw new ArgumentException("SizeBytes must be > 0.", nameof(sizeBytes));
+
+        FileKey = fileKey.Trim();
+        OriginalFileName = originalFileName.Trim();
+        ContentType = string.IsNullOrWhiteSpace(contentType) ? "application/octet-stream" : contentType.Trim();
+        SizeBytes = sizeBytes;
         UpdatedAt = utcNow;
     }
 }

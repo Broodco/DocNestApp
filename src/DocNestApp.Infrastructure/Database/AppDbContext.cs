@@ -24,6 +24,11 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
 
             b.HasIndex(x => new { x.UserId, x.SubjectId });
             b.HasIndex(x => new { x.UserId, x.ExpiresOn });
+            
+            b.Property(x => x.FileKey).HasMaxLength(300);
+            b.Property(x => x.OriginalFileName).HasMaxLength(255);
+            b.Property(x => x.ContentType).HasMaxLength(100);
+            b.Property(x => x.SizeBytes);
         });
     }
 }

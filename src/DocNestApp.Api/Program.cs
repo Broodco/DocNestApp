@@ -1,15 +1,28 @@
 using DocNestApp.Infrastructure;
 using DocNestApp.Infrastructure.Database;
+using FastEndpoints;
+using FastEndpoints.Swagger;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddFastEndpoints();
+builder.Services.SwaggerDocument();
 
 var app = builder.Build();
 
+if (app.Environment.IsDevelopment())
+{
+    using var scope = app.Services.CreateScope();
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    await db.Database.MigrateAsync();
+}
+
+app.UseFastEndpoints();
+app.UseSwaggerGen();
 app.MapGet("/health", () => Results.Ok("OK"));
 
-// Optional: quick DB check endpoint while wiring things
 app.MapGet("/db-ping", async (AppDbContext db, CancellationToken ct) =>
 {
     var canConnect = await db.Database.CanConnectAsync(ct);

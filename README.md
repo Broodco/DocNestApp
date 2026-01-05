@@ -197,7 +197,7 @@ This allows:
 
 🚧 **In development**  
 Currently focusing on:
-- First vertical slice: document creation with file upload
+- Third vertical slice : setting up the background worker and reminders
 
 ---
 

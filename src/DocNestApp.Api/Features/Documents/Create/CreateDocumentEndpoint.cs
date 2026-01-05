@@ -26,7 +26,13 @@ public sealed class CreateDocumentEndpoint(AppDbContext db, IFileStore fileStore
         Summary(s =>
         {
             s.Summary = "Create a document";
-            s.Description = "Creates a document and returns its id. Sets Location header to the new resource URL.";
+            s.Description =
+                "Creates a document with metadata and an optional file.\n\n" +
+                "Form fields:\n" +
+                "- title (string)\n" +
+                "- type (string)\n" +
+                "- expiresOn (yyyy-MM-dd, optional)\n" +
+                "- file (binary, optional)";
         });
     }
 

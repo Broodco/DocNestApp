@@ -12,7 +12,8 @@ builder.Services.SwaggerDocument();
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment() &&
+    builder.Configuration.GetValue("DocNest:AutoMigrate", true))
 {
     using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
@@ -30,3 +31,5 @@ app.MapGet("/db-ping", async (AppDbContext db, CancellationToken ct) =>
 });
 
 app.Run();
+
+public partial class Program { }

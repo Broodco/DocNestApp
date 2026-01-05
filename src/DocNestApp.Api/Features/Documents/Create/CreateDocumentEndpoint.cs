@@ -71,7 +71,9 @@ public sealed class CreateDocumentEndpoint(AppDbContext db, IFileStore fileStore
         HttpContext.Response.Headers.Location = location;
         HttpContext.Response.StatusCode = StatusCodes.Status201Created;
 
-        await Send.OkAsync(new CreateDocumentResponse { Id = doc.Id }, ct);
+        await HttpContext.Response.WriteAsJsonAsync(
+            new CreateDocumentResponse { Id = doc.Id },
+            cancellationToken: ct);
     }
 }
 

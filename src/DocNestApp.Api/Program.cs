@@ -1,17 +1,19 @@
+using DocNestApp.Infrastructure;
+using DocNestApp.Infrastructure.Database;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+builder.Services.AddInfrastructure(builder.Configuration);
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-}
+app.MapGet("/health", () => Results.Ok("OK"));
 
-app.UseHttpsRedirection();
+// Optional: quick DB check endpoint while wiring things
+app.MapGet("/db-ping", async (AppDbContext db, CancellationToken ct) =>
+{
+    var canConnect = await db.Database.CanConnectAsync(ct);
+    return Results.Ok(new { canConnect });
+});
 
 app.Run();

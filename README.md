@@ -8,14 +8,78 @@ This repository contains a **finished MVP**, not a commercial product.
 
 ---
 
-## 🎯 Goals
+## 📸 Screenshots
+
+### Home
+Entry point with navigation and demo tooling.
+
+![Home page](docs/screenshots/screenshot_index.png)
+
+### Documents list
+Browse documents with filters and expiration status.
+
+![Documents list](docs/screenshots/screenshot_doclist.png)
+
+### Document details
+Inspect metadata and download attached files.
+
+![Document details](docs/screenshots/screenshot_details.png)
+
+### Create document
+Create documents with multipart forms, including an optional file upload.
+
+![Swagger](docs/screenshots/screenshot_add_doc.png)
+
+---
+
+## 🚀 Run locally
+
+DocNest uses **.NET Aspire** for local development orchestration.
+
+### Prerequisites
+- .NET SDK (net10)
+- Docker (required for PostgreSQL via Aspire)
+
+### Start the application
+
+From the repository root, run:
+
+    dotnet run --project src/DocNestApp.AppHost
+
+This starts:
+- API
+- Web UI
+- Background worker
+- PostgreSQL
+
+### Access the application
+
+- **Web UI**  
+  http://localhost:8080
+
+- **API Swagger**  
+  Available via the link on the home page  
+  (or directly on the API service port shown in the Aspire dashboard)
+
+### Demo data
+
+- Demo data can be reset in Development
+- The Web UI exposes a **“Reset demo data”** button on the home page
+- A development-only API endpoint is also available:
+
+  POST /dev/reset-demo
+
+
+---
+
+## 🎯 General Goals
 
 DocNest aims to:
 
 - Centralize administrative documents
 - Track expiration dates
-- Generate reminders before deadlines
-- Support multiple subjects (household members) once authentication is implemented
+- Generate reminders before deadlines 
+- Support multiple subjects (household members) (authentication is out of scope for the MVP)
 - Remain simple, maintainable, and shippable
 
 The project deliberately prioritizes **clarity and delivery** over feature breadth.
@@ -58,7 +122,6 @@ Example:
             Create/
             List/
             Get/
----
 
 ### Clean-ish Boundaries
 
@@ -92,7 +155,7 @@ The goal is useful boundaries, not theoretical purity.
 
 ---
 
-## 🚀 MVP Scope
+## 📦 MVP Scope
 
 The MVP focuses on **three core user journeys**:
 

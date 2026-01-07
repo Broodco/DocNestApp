@@ -10,19 +10,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
-public sealed class ReminderJobTests : IClassFixture<PostgresFixture>
+public sealed class ReminderJobTests(PostgresFixture postgres) : IClassFixture<PostgresFixture>
 {
-    private readonly PostgresFixture _postgres;
-
-    public ReminderJobTests(PostgresFixture postgres)
-    {
-        _postgres = postgres;
-    }
-
     [Fact]
     public async Task RunOnce_creates_reminder_for_doc_expiring_in_1_day()
     {
-        await _postgres.ResetAsync();
+        await postgres.ResetAsync();
 
         var now = new DateTime(2026, 01, 05, 12, 00, 00, DateTimeKind.Utc);
         var expiresOn = DateOnly.FromDateTime(now.AddDays(1));
@@ -42,7 +35,7 @@ public sealed class ReminderJobTests : IClassFixture<PostgresFixture>
             await db.SaveChangesAsync();
         }
 
-        var sp = ReminderJobFactory.Build(_postgres.ConnectionString, new ReminderOptions
+        var sp = ReminderJobFactory.Build(postgres.ConnectionString, new ReminderOptions
         {
             ScanIntervalSeconds = 999999,
             DaysBefore = [1]
@@ -70,7 +63,7 @@ public sealed class ReminderJobTests : IClassFixture<PostgresFixture>
     [Fact]
     public async Task RunOnce_marks_due_reminders_as_dispatched()
     {
-        await _postgres.ResetAsync();
+        await postgres.ResetAsync();
 
         var now = new DateTime(2026, 01, 05, 12, 00, 00, DateTimeKind.Utc);
         var expiresOn = DateOnly.FromDateTime(now.AddDays(1));
@@ -103,7 +96,7 @@ public sealed class ReminderJobTests : IClassFixture<PostgresFixture>
             await db.SaveChangesAsync();
         }
 
-        var sp = ReminderJobFactory.Build(_postgres.ConnectionString, new ReminderOptions
+        var sp = ReminderJobFactory.Build(postgres.ConnectionString, new ReminderOptions
         {
             ScanIntervalSeconds = 999999,
             DaysBefore = [1]
@@ -130,7 +123,7 @@ public sealed class ReminderJobTests : IClassFixture<PostgresFixture>
     private AppDbContext CreateDb()
     {
         var opts = new DbContextOptionsBuilder<AppDbContext>()
-            .UseNpgsql(_postgres.ConnectionString)
+            .UseNpgsql(postgres.ConnectionString)
             .Options;
 
         return new AppDbContext(opts);

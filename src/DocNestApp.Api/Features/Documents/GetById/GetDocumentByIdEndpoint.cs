@@ -1,10 +1,11 @@
+using DocNestApp.Contracts.Documents;
 using DocNestApp.Infrastructure.Database;
 using FastEndpoints;
 using Microsoft.EntityFrameworkCore;
 
 namespace DocNestApp.Api.Features.Documents.GetById;
 
-public sealed class GetDocumentByIdEndpoint(AppDbContext db) : Endpoint<GetDocumentByIdRequest, GetDocumentByIdResponse>
+public sealed class GetDocumentByIdEndpoint(AppDbContext db) : Endpoint<GetDocumentByIdRequest, GetDocumentResponse>
 {
     public override void Configure()
     {
@@ -19,14 +20,20 @@ public sealed class GetDocumentByIdEndpoint(AppDbContext db) : Endpoint<GetDocum
         var doc = await db.Documents
             .AsNoTracking()
             .Where(d => d.Id == req.Id && d.UserId == userId)
-            .Select(d => new GetDocumentByIdResponse
-            {
-                Id = d.Id,
-                Title = d.Title,
-                Type = d.Type,
-                ExpiresOn = d.ExpiresOn,
-                HasFile = d.FileKey != null
-            })
+            .Select(d => new GetDocumentResponse(
+                new DocumentDto(
+                    d.Id, 
+                    d.UserId, 
+                    d.SubjectId, 
+                    d.Title, 
+                    d.Type, 
+                    d.ExpiresOn, 
+                    d.CreatedAt, 
+                    d.UpdatedAt, 
+                    d.FileKey, 
+                    d.OriginalFileName, 
+                    d.ContentType, 
+                    d.SizeBytes)))
             .SingleOrDefaultAsync(ct);
 
         if (doc is null)
@@ -42,13 +49,4 @@ public sealed class GetDocumentByIdEndpoint(AppDbContext db) : Endpoint<GetDocum
 public sealed class GetDocumentByIdRequest
 {
     public Guid Id { get; init; }
-}
-
-public sealed class GetDocumentByIdResponse
-{
-    public Guid Id { get; init; }
-    public string Title { get; init; } = null!;
-    public string Type { get; init; } = null!;
-    public DateOnly? ExpiresOn { get; init; }
-    public bool HasFile { get; init; }
 }

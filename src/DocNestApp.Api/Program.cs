@@ -9,6 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddFastEndpoints();
 builder.Services.SwaggerDocument();
+builder.Services.AddScoped<DocNestApp.Infrastructure.Demo.DemoSeeder>();
 
 var app = builder.Build();
 
@@ -16,8 +17,12 @@ if (app.Environment.IsDevelopment() &&
     builder.Configuration.GetValue("DocNest:AutoMigrate", true))
 {
     using var scope = app.Services.CreateScope();
+    
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     await db.Database.MigrateAsync();
+    
+    var seeder = scope.ServiceProvider.GetRequiredService<DocNestApp.Infrastructure.Demo.DemoSeeder>();
+    await seeder.SeedIfNeededAsync(DateTime.UtcNow);
 }
 
 app.UseFastEndpoints();

@@ -1,3 +1,4 @@
+using DocNestApp.Contracts.Documents;
 using FluentValidation;
 
 namespace DocNestApp.Api.Features.Documents.List;
@@ -81,58 +82,29 @@ public sealed class ListDocumentsEndpoint(AppDbContext db)
             .ThenByDescending(d => d.Id)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
-            .Select(d => new DocumentListItem
-            {
-                Id = d.Id,
-                Title = d.Title,
-                Type = d.Type,
-                HasFile = d.FileKey != null,
-                ExpiresOn = d.ExpiresOn,
-                CreatedAt = d.CreatedAt,
-                UpdatedAt = d.UpdatedAt
-            })
+            .Select(d => new DocumentDto(
+                d.Id,
+                d.UserId,
+                d.SubjectId,
+                d.Title,
+                d.Type,
+                d.ExpiresOn,
+                d.CreatedAt,
+                d.UpdatedAt,
+                d.FileKey,
+                d.OriginalFileName,
+                d.ContentType,
+                d.SizeBytes))
             .ToListAsync(ct);
 
-        var response = new ListDocumentsResponse
-        {
-            Page = page,
-            PageSize = pageSize,
-            Total = total,
-            Items = items
-        };
+        var response = new ListDocumentsResponse(
+            Page: page,
+            PageSize: pageSize,
+            Total: total,
+            Items: items);
 
         await Send.OkAsync(response, ct);
     }
-}
-
-public sealed class ListDocumentsRequest
-{
-    public int Page { get; init; } = 1;
-    public int PageSize { get; init; } = 20;
-    public string? Q { get; init; }
-    public string? Type { get; init; }
-    public DateOnly? ExpiresBefore { get; init; }
-    public DateOnly? ExpiresAfter { get; init; }
-    public bool IncludeNoExpiry { get; init; } = false;
-}
-
-public sealed class ListDocumentsResponse
-{
-    public int Page { get; init; }
-    public int PageSize { get; init; }
-    public int Total { get; init; }
-    public IReadOnlyList<DocumentListItem> Items { get; init; } = Array.Empty<DocumentListItem>();
-}
-
-public sealed class DocumentListItem
-{
-    public Guid Id { get; init; }
-    public string Title { get; init; } = null!;
-    public string Type { get; init; } = null!;
-    public DateOnly? ExpiresOn { get; init; }
-    public DateTime CreatedAt { get; init; }
-    public DateTime UpdatedAt { get; init; }
-    public bool HasFile { get; init; }
 }
 
 public sealed class ListDocumentsValidator : AbstractValidator<ListDocumentsRequest>

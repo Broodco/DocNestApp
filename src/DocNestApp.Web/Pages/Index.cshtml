@@ -1,0 +1,61 @@
+@page "/"
+@model DocNestApp.Web.Pages.IndexModel
+@{
+    ViewData["Title"] = "Home";
+}
+
+<header>
+    <h1 style="margin-bottom:0.25rem;">DocNest</h1>
+    <p>
+        Personal document tracker (portfolio MVP). Minimal UI over a clean API + worker.
+    </p>
+</header>
+
+@if (!string.IsNullOrWhiteSpace(Model.Toast))
+{
+    <article>
+        <strong>@Model.Toast</strong>
+    </article>
+}
+
+<article>
+    <h2>Quick links</h2>
+    <p>
+        <a href="/documents" role="button">Browse documents</a>
+        <a href="/documents/new" role="button" class="secondary">Add a document</a>
+    </p>
+
+    <ul>
+        <li><a href="/documents">Documents list</a> — filter & paginate</li>
+        <li><a href="/documents/new">Create</a> — metadata + optional file upload</li>
+    </ul>
+</article>
+
+<article>
+    <h2>API</h2>
+
+    @if (!string.IsNullOrWhiteSpace(Model.SwaggerUrl))
+    {
+        <p>
+            <a href="@Model.SwaggerUrl" target="_blank" rel="noopener noreferrer">Open Swagger</a>
+            <small>(API host: @Model.ApiBaseUrl)</small>
+        </p>
+    }
+    else
+    {
+        <p><small>Swagger link unavailable (DocNest:ApiBaseUrl not configured).</small></p>
+    }
+</article>
+
+@if (Model.IsDevelopment)
+{
+    <article>
+        <h2>Demo tools</h2>
+        <p>This is Development-only.</p>
+
+        <form method="post" asp-page-handler="ResetDemo" onsubmit="return confirm('Reset demo data and reseed?');">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="contrast">Reset demo data</button>
+        </form>
+    </article>
+}

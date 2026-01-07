@@ -31,7 +31,7 @@ public sealed class DocNestApiFactory : WebApplicationFactory<Program>
                 ["DocNest:AutoMigrate"] = "false",
                 ["ConnectionStrings:docnest-db"] = _connectionString,
                 ["FileStore:RootPath"] = _fileRoot,
-
+                ["DocNest:DemoMode"] = "false",
                 ["Reminders:ScanIntervalSeconds"] = "999999"
             };
 

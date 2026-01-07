@@ -1,0 +1,34 @@
+@page "/documents/new"
+@model DocNestApp.Web.Pages.Documents.NewModel
+@{
+    ViewData["Title"] = "Add document";
+}
+
+<h1>Add document</h1>
+
+<form method="post" enctype="multipart/form-data" style="max-width:600px; display:flex; flex-direction:column; gap:16px;">
+    <div>
+        <label>Title</label><br />
+        <input asp-for="Title" required />
+    </div>
+
+    <div>
+        <label>Type</label><br />
+        <input asp-for="Type" required placeholder="Identity, Contract, Insurance..." />
+    </div>
+
+    <div>
+        <label>Expires on</label><br />
+        <input asp-for="ExpiresOn" type="date" />
+    </div>
+
+    <div>
+        <label>File (optional)</label><br />
+        <input asp-for="File" type="file" />
+    </div>
+
+    <div style="display:flex; gap:8px;">
+        <button type="submit">Create</button>
+        <a href="/documents">Cancel</a>
+    </div>
+</form>

@@ -1,4 +1,5 @@
 using DocNestApp.Application.Abstractions.Storage;
+using DocNestApp.Contracts.Documents;
 
 namespace DocNestApp.Api.Features.Documents.Create;
 
@@ -72,7 +73,7 @@ public sealed class CreateDocumentEndpoint(AppDbContext db, IFileStore fileStore
         HttpContext.Response.StatusCode = StatusCodes.Status201Created;
 
         await HttpContext.Response.WriteAsJsonAsync(
-            new CreateDocumentResponse { Id = doc.Id },
+            new CreateDocumentResponse (doc.Id),
             cancellationToken: ct);
     }
 }
@@ -83,11 +84,6 @@ public sealed class CreateDocumentRequest
     public string Type { get; init; } = null!;
     public DateOnly? ExpiresOn { get; init; }
     public IFormFile? File { get; init; } = null!;
-}
-
-public sealed class CreateDocumentResponse
-{
-    public Guid Id { get; init; }
 }
 
 public sealed class CreateDocumentValidator : AbstractValidator<CreateDocumentRequest>

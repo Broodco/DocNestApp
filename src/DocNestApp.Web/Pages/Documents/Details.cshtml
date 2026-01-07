@@ -1,0 +1,56 @@
+@page "/documents/{id:guid}"
+@model DocNestApp.Web.Pages.Documents.DetailsModel
+@{
+    ViewData["Title"] = "Document details";
+}
+
+@if (Model.Document is null)
+{
+    <p>Document not found.</p>
+}
+else
+{
+    var d = Model.Document;
+
+    <article class="stack">
+        <header>
+            <h1 style="margin-bottom:.25rem;">@d.Title</h1>
+            <p class="muted" style="margin:0;">@d.Type</p>
+        </header>
+
+        <div class="grid">
+            <div>
+                <strong>Expires</strong><br />
+                @(d.ExpiresOn?.ToString("dd-MM-yyyy") ?? "—")
+            </div>
+            <div>
+                <strong>Created</strong><br />
+                @d.CreatedAt.ToString("dd-MM-yyyy")
+            </div>
+            <div>
+                <strong>Updated</strong><br />
+                @d.UpdatedAt.ToString("dd-MM-yyyy")
+            </div>
+        </div>
+
+        <div>
+            <strong>File</strong><br />
+            @if (d.FileKey is not null)
+            {
+                <span class="muted">@d.OriginalFileName</span>
+                <span class="muted">(@(d.SizeBytes?.ToString("N0") ?? "—") bytes)</span>
+                <div style="margin-top:.5rem;">
+                    <a href="/documents/@d.Id/file" role="button">Download</a>
+                </div>
+            }
+            else
+            {
+                <span class="muted">—</span>
+            }
+        </div>
+
+        <footer>
+            <a href="/documents">← Back to list</a>
+        </footer>
+    </article>
+}

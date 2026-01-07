@@ -1,0 +1,101 @@
+@page "/documents"
+@model DocNestApp.Web.Pages.Documents.IndexModel
+@using DocNestApp.Web.Formatting
+@functions {
+    static (string Label, string Css) ExpiryBadge(DateOnly? expiresOn)
+    {
+        if (expiresOn is null) return ("No expiry", "secondary");
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+
+        if (expiresOn < today) return ("Expired", "contrast");
+        if (expiresOn <= today.AddDays(30)) return ("Soon", "warning");
+        return ("OK", "secondary");
+    }
+}
+
+@{
+    ViewData["Title"] = "Documents";
+}
+
+<h1>Documents</h1>
+
+<form method="get">
+    <fieldset class="grid">
+        <label>
+            Search
+            <input name="q" value="@Model.Q" placeholder="title contains..." />
+        </label>
+
+        <label>
+            Type
+            <input name="type" value="@Model.Type" placeholder="Identity, Contract..." />
+        </label>
+
+        <label>
+            Expires after
+            <input type="date" name="expiresAfter" value="@(Model.ExpiresAfter?.ToString("yyyy-MM-dd") ?? "")" />
+        </label>
+
+        <label>
+            Expires before
+            <input type="date" name="expiresBefore" value="@(Model.ExpiresBefore?.ToString("yyyy-MM-dd") ?? "")" />
+        </label>
+
+        <label>
+            <input type="checkbox" name="includeNoExpiry" value="true" @(Model.IncludeNoExpiry ? "checked" : "") />
+            Include no expiry
+        </label>
+    </fieldset>
+
+    <div class="grid">
+        <button type="submit">Apply</button>
+        <a href="/documents" role="button" class="secondary">Reset</a>
+    </div>
+</form>
+
+<p>Total: <strong>@Model.Result.Total</strong></p>
+
+<table style="width:100%; border-collapse:collapse;">
+    <thead>
+    <tr style="text-align:left;">
+        <th style="border-bottom:1px solid #eee; padding:8px;">Title</th>
+        <th style="border-bottom:1px solid #eee; padding:8px;">Type</th>
+        <th style="border-bottom:1px solid #eee; padding:8px;">Expires</th>
+        <th style="border-bottom:1px solid #eee; padding:8px;">File</th>
+        <th style="border-bottom:1px solid #eee; padding:8px;">Updated</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var d in Model.Result.Items)
+    {
+        <tr>
+            <td style="border-bottom:1px solid #f2f2f2; padding:8px;">
+                <a href="/documents/@d.Id">@d.Title</a>
+            </td>
+            <td style="border-bottom:1px solid #f2f2f2; padding:8px;">@d.Type</td>
+            @{
+                var b = ExpiryBadge(d.ExpiresOn);
+            }
+            <td class="nowrap">
+                <span class="@($"tag {b.Css}")">@b.Label</span>
+                <span class="muted" style="margin-left:.5rem;">
+                    @(d.ExpiresOn?.ToString("dd-MM-yyyy") ?? "—")
+                </span>
+            </td>
+            <td class="nowrap">
+                @if (d.FileKey is not null)
+                {
+                    <small>📎 Attached</small>
+                }
+                else
+                {
+                    <small class="muted">—</small>
+                }
+            </td>
+            <td style="border-bottom:1px solid #f2f2f2; padding:8px;">
+                @d.UpdatedAt.ToString(DateFormats.Display)
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

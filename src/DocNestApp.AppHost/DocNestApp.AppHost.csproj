@@ -11,6 +11,7 @@
   <ItemGroup>
     <ProjectReference Include="..\DocNestApp.Api\DocNestApp.Api.csproj" />
     <ProjectReference Include="..\DocNestApp.ServiceDefaults\DocNestApp.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\DocNestApp.Web\DocNestApp.Web.csproj" />
     <ProjectReference Include="..\DocNestApp.Worker\DocNestApp.Worker.csproj" />
   </ItemGroup>
 

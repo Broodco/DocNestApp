@@ -103,4 +103,8 @@ public sealed class CreateDocumentValidator : AbstractValidator<CreateDocumentRe
                 .LessThanOrEqualTo(10 * 1024 * 1024) // 10MB MVP cap
                 .WithMessage("File is too large (max 10MB).");
         });
+        
+        RuleFor(x => x.ExpiresOn)
+            .Must(d => d is null || d >= DateOnly.FromDateTime(DateTime.UtcNow))
+            .WithMessage("Expiration date cannot be in the past.");
     }}

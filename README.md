@@ -1,47 +1,48 @@
-# DocNestApp
+# DocNest
 
-**DocNestApp** is a personal document tracker designed to help individuals and households keep control over their administrative documents and deadlines.
+**DocNest** is a small personal document tracker designed to help individuals or households keep control over administrative documents and expiration deadlines.
 
-The application centralizes document metadata and files, tracks expiration dates, and sends reminders before important deadlines — all while remaining intentionally small, pragmatic, and finishable.
+It centralizes document metadata and files, tracks expiration dates, and generates reminders before important deadlines — while remaining intentionally **minimal, pragmatic, and finishable**.
 
-This project is **portfolio-oriented** and focuses on **clean delivery, modern .NET practices, and architectural restraint**.
+This repository contains a **finished MVP**, not a commercial product.
 
 ---
 
-## 🎯 Project Goals
+## 🎯 Goals
 
 DocNest aims to:
 
-- Centralize administrative documents in one place
-- Track document expiration dates
-- Send reminders before deadlines
-- Support multiple household members
-- Remain simple, shippable, and maintainable
+- Centralize administrative documents
+- Track expiration dates
+- Generate reminders before deadlines
+- Support multiple subjects (household members) once authentication is implemented
+- Remain simple, maintainable, and shippable
 
-This is **not** a full commercial product.
-It is a **finished MVP** designed to demonstrate sound engineering decisions.
+The project deliberately prioritizes **clarity and delivery** over feature breadth.
 
 ---
 
 ## 🚫 Non-Goals
 
-To keep delivery speed high, DocNest intentionally avoids:
+To keep scope under control, the MVP intentionally avoids:
 
 - Microservices
 - Message brokers (Kafka, RabbitMQ, etc.)
 - Outbox / Inbox patterns
 - Event sourcing
-- Over-engineered RBAC systems
-- Premature abstractions
+- Authentication & RBAC
+- Generic repositories
+- Heavy CQRS frameworks
 
-Advanced features may be explored later, but they are explicitly **out of scope** for the MVP.
+Ideas outside the MVP scope are captured in `NOT_NOW.md`.
 
 ---
 
-## 🧠 Architectural Principles
+## 🧠 Architecture
 
 ### Vertical Slice Architecture
-Features are implemented as **vertical slices**, each owning its full execution path:
+
+Each feature is implemented as a **vertical slice**, owning its full execution path:
 
 - HTTP endpoint
 - Validation
@@ -50,158 +51,129 @@ Features are implemented as **vertical slices**, each owning its full execution 
 
 This minimizes cross-cutting changes and avoids excessive scaffolding.
 
-Example structure:
+Example:
 
-```
-Features/
-  Documents/
-    Create/
-      Endpoint.cs
-      Request.cs
-      Response.cs
-      Validator.cs
-    List/
-      Endpoint.cs
-      Request.cs
-      Response.cs
-```
+    Features/
+        Documents/
+            Create/
+            List/
+            Get/
+---
 
-## Clean-ish Boundaries
-Clean Architecture principles are applied **only where they reduce friction**.
+### Clean-ish Boundaries
 
-- Domain logic stays clean when it enforces real invariants
-- Infrastructure details are allowed to leak early if it improves speed
-- Logic is promoted (to value objects or services) only when repetition or complexity justifies it
+Clean Architecture principles are applied **pragmatically**:
+
+- Domain logic enforces real invariants
+- Infrastructure details may leak early if it improves speed
+- Logic is promoted only when repetition or complexity justifies it
+
+The goal is useful boundaries, not theoretical purity.
 
 ---
 
 ## 🧩 Domain Modeling Guidelines
 
-### Keep logic inside a slice when:
-- It is used only once
-- It is trivial
-- It does not enforce invariants
+- Keep logic inside a slice when:
+    - It is trivial
+    - Used only once
+    - Does not enforce invariants
 
-### Promote to a Value Object when:
-- Validation rules repeat
-- Formatting must be consistent
-- Invariants must never be broken
+- Promote to a Value Object when:
+    - Validation rules repeat
+    - Formatting must be consistent
+    - Invariants must never be broken
 
-**Examples:**
-- `ExpiryDate`
-- `ReminderPolicy`
-- `DocumentNumber`
+- Promote to a Domain Service when:
+    - Logic spans multiple entities
 
-### Promote to a Domain Service when:
-- Logic spans multiple entities
-- It does not naturally belong to a single aggregate
-
-### Promote to an Application Service when:
-- Orchestrating infrastructure (storage, email, background jobs)
-- The concern is *how* rather than *what is correct*
+- Promote to an Application Service when:
+    - Orchestrating infrastructure (storage, background jobs)
 
 ---
 
 ## 🚀 MVP Scope
 
-The MVP is intentionally limited to **three core user journeys**:
+The MVP focuses on **three core user journeys**:
 
-1. **Add a document**
-   - Metadata (type, owner, expiration date)
-   - File upload
-2. **Browse documents + see what's urgent**
-   - List + filters (subject, type, status)
-   - See soon to be expired + expired
-   - View details + download file
-3. **Expiration reminders**
-   - Background worker checks expiration dates
-   - Notifications are generated before deadlines
+### 1. Add a document
+- Metadata (title, type, subject, expiration)
+- Optional file upload
 
-Any feature not supporting these journeys goes into a `NOT_NOW.md` list.
+### 2. Browse and inspect documents
+- List with pagination and light filtering
+- Expiration status indicators
+- View details
+- Download attached files
+
+### 3. Expiration reminders
+- Background worker checks expiring documents
+- Reminder generation is idempotent
+- Due reminders are dispatched (currently logged)
 
 ---
 
 ## 🧱 Technical Stack
 
 ### Backend
-- **.NET** (latest LTS)
+- **.NET** (net10)
 - **FastEndpoints**
 - **EF Core**
 - **PostgreSQL**
 - **FluentValidation**
 - **OpenAPI / Swagger**
 
+### Frontend
+- **Razor Pages**
+- Minimal UI using **Pico.css**
+- Exists to demonstrate API usage, not as a full client
+
 ### Local Development
-- **.NET Aspire** for orchestration
-  - API
-  - PostgreSQL
-  - Background worker
+- **.NET Aspire** (development-time orchestration only)
+    - API
+    - Web UI
+    - Background worker
+    - PostgreSQL
 
-Aspire is used strictly as a **development-time orchestrator**.  
-All services can run standalone without Aspire.
-
----
-
-## 🔥 Avoiding Boilerplate Burnout
-
-This project intentionally avoids:
-
-- Generic repositories
-- Excessive layering
-- Abstract base services “for future reuse”
-- Framework-heavy CQRS implementations
-
-Instead, it favors:
-- Direct `DbContext` usage
-- Explicit queries per feature
-- Clear, boring, readable code
-- Duplication over premature generalization
+All services can run **standalone** without Aspire.
 
 ---
 
-## 🧠 Finishing Strategy (Important)
+## 🧪 Testing Strategy
 
-DocNest follows a strict **“Portfolio Done”** definition:
+- **Integration tests** using Testcontainers + real PostgreSQL
+- Tests cover:
+    - Document creation & retrieval
+    - Listing & filtering
+    - Reminder generation & dispatch
+- Focus on testing **real user flows**, not internal abstractions
 
-The project is considered **done** when:
+---
+
+## 🧪 Demo Mode
+
+- Demo data can be seeded automatically
+- A development-only endpoint allows resetting demo data
+- The Web UI exposes a “Reset demo data” button in Development
+
+This makes the project easy to explore without manual setup.
+
+---
+
+## 🧠 Finishing Philosophy
+
+DocNest follows a strict **“MVP Done”** definition:
+
+The project is considered done when:
 - It runs with a single command (Aspire)
-- Demo data is seeded
+- Demo data is available
 - The 3 MVP user journeys are complete
-- A README and screenshots exist
-- A demo is deployed **or** a demo video is recorded
+- Documentation and screenshots exist
 
 Anything beyond this is optional.
 
 ---
 
-## 🛑 NOT_NOW Philosophy
-
-Ideas that are interesting but out of scope are captured in `NOT_NOW.md`.
-
-This allows:
-- Preserving ideas without losing momentum
-- Preventing scope creep
-- Maintaining focus on finishing
-
----
-
-## 🧪 Testing Strategy (Planned)
-
-- Integration tests for core slices
-- Minimal unit testing for domain invariants
-- Focus on testing real user flows rather than internals
-
----
-
-## 📌 Status
-
-🚧 **In development**  
-Currently focusing on:
-- Third vertical slice : setting up the background worker and reminders
-
----
-
 ## 📜 License
 
-This project is intended for educational and portfolio purposes.
-Licensed under MIT.
+MIT License.

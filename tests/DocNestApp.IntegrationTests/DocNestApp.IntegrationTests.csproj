@@ -29,6 +29,7 @@
       <ProjectReference Include="..\..\src\DocNestApp.Api\DocNestApp.Api.csproj" />
       <ProjectReference Include="..\..\src\DocNestApp.Infrastructure\DocNestApp.Infrastructure.csproj" />
       <ProjectReference Include="..\..\src\DocNestApp.Worker\DocNestApp.Worker.csproj" />
+      <ProjectReference Include="..\..\src\DocNestApp.Contracts\DocNestApp.Contracts.csproj" />
     </ItemGroup>
 
 </Project>
